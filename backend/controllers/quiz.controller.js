@@ -47,13 +47,47 @@ export const createQuiz = async (req, res) => {
     }
 };
 
-export const getQuiz = async(req, res) => {
+export const getQuiz = async (req, res) => {
     try {
-        const {id: quizId} = req.params    
-        const quiz = await Quiz.findById(quizId);
+        const { id: quizId } = req.params;
 
-        return res.status(200).json(quiz)
+        // Fetch the quiz
+        const quiz = await Quiz.findById(quizId);
+        if (!quiz) {
+            return res.status(404).json({ error: "Quiz not found" });
+        }
+
+        // Populate questions manually
+        const populatedQuestions = await Promise.all(
+            quiz.questions.map(async ({ questionId, questionType }) => {
+                let question = null;
+
+                // Fetch from the respective collection
+                switch (questionType) {
+                    case "CategoryQuestion":
+                        question = await CategoryQuestion.findById(questionId);
+                        break;
+                    case "ClozeQuestion":
+                        question = await ClozeQuestion.findById(questionId);
+                        break;
+                    case "CompQuestion":
+                        question = await CompQuestion.findById(questionId);
+                        break;
+                    default:
+                        throw new Error(`Invalid question type: ${questionType}`);
+                }
+
+                return { questionType, question };
+            })
+        );
+
+        // Send the populated quiz data
+        res.status(200).json({
+            ...quiz._doc, // Spread existing quiz data
+            questions: populatedQuestions, // Replace with populated questions
+        });
     } catch (error) {
-        res.status(500).json({ error: error.message });   
+        res.status(500).json({ error: error.message });
     }
-}
+};
+
