@@ -3,6 +3,9 @@ import express from 'express';
 import dotenv from 'dotenv';
 import connectDB from './db/connectDB.js';
 
+import questionRouter from './routers/questions.routes.js'
+import quizRouter from './routers/quiz.routes.js'
+
 dotenv.config({
     path: './.env'
 })
@@ -14,6 +17,9 @@ const PORT = process.env.PORT || 8000;
 const __dirname = path.resolve();
 
 app.use(express.json());
+
+app.use("/api/question", questionRouter)
+app.use("/api/quiz", quizRouter)
 
 app.use(express.static(path.join(__dirname, "/frontend/dist")))
 app.get("*",(req, res) => {

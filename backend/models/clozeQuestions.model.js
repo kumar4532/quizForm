@@ -3,7 +3,6 @@ import mongoose, { Schema } from "mongoose";
 const ClozeQuestionSchema = new mongoose.Schema({
     questionText: { 
         type: String, 
-        required: true 
     },
     blanks: [
         {

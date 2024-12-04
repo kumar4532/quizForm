@@ -1,21 +1,23 @@
 import mongoose, { Schema } from "mongoose";
 
 const QuizSchema = new mongoose.Schema({
-    type: {
+    title: {
         type: String,
-        enum: ['Categorize', 'Cloze', 'Comprehension'],
         required: true
     },
-    questionRef: {
-        type: Schema.Types.ObjectId,
-        required: true,
-        refPath: 'typeRef'
-    },
-    typeRef: {
-        type: String,
-        required: true,
-        enum: ['CategoryQuestion', 'ClozeQuestion', 'CompQuestion'],
-    },
+    questions: [
+        {
+            questionId: {
+                type: mongoose.Schema.Types.ObjectId,
+                required: true
+            },
+            questionType: {
+                type: String,
+                enum: ["CategoryQuestion", "ClozeQuestion", "CompQuestion"],
+                required: true
+            }
+        }
+    ]
 }, { timestamps: true })
 
 const Quiz = mongoose.model("quiz", QuizSchema)
